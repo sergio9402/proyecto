@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestor de Tareas - FastAPI & MongoDB Atlas</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f4f4f9; }
+        .container { max-width: 600px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); }
+        input, button { padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; }
+        button { background: #007BFF; color: white; border: none; cursor: pointer; border-radius: 4px; }
+        button:hover { background: #0056b3; }
+        ul { list-style: none; padding: 0; }
+        li { background: #e9ecef; margin: 5px 0; padding: 10px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Gestor de Tareas </h2>
+        <input type="text" id="titulo" placeholder="Título de la tarea">
+        <input type="text" id="desc" placeholder="Descripción">
+        <button onclick="crearTarea()">Guardar Tarea</button>
+        <h3>Lista de Tareas</h3>
+        <ul id="lista"></ul>
+    </div>
+    <script>
+        async function cargarTareas() {
+            let res = await fetch('/tareas');
+            let data = await res.json();
+            let lista = document.getElementById('lista');
+            lista.innerHTML = '';
+            data.forEach(t => {
+                let li = document.createElement('li');
+                li.innerHTML = `<strong>${t.titulo}</strong>: ${t.descripcion}`;
+                lista.appendChild(li);
+            });
+        }
+        async function crearTarea() {
+            let titulo = document.getElementById('titulo').value;
+            let descripcion = document.getElementById('desc').value;
+            if(!titulo) return alert('Escribe un título');
+            await fetch('/tareas', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ titulo, descripcion })
+            });
+            document.getElementById('titulo').value = '';
+            document.getElementById('desc').value = '';
+            cargarTareas();
+        }
+        cargarTareas();
+    </script>
+</body>
+</html>

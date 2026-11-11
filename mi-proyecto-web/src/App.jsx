@@ -1,0 +1,249 @@
+import { useEffect, useState } from 'react'
+import heroImg from './assets/hero.png'
+import reactLogo from './assets/react.svg'
+import viteLogo from './assets/vite.svg'
+import './App.css'
+import axios from 'axios';
+
+
+
+
+function App() {
+  const [count, setCount] = useState(0)
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+
+
+
+  // Estados para los inputs del formulario
+  const [titulo, setTitulo] = useState('');
+  const [descripcion, setDescripcion] = useState('');
+
+  // 1. Cargar las tareas al iniciar la aplicación (GET)
+  const cargarTareas = () => {
+    setLoading(true);
+    axios.get('http://127.0.0.1:8000/tareas')
+      .then((response) => {
+        setData(response.data);
+        setError(null);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error al conectar con el backend:", err);
+        setError("No se pudo conectar con el backend");
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    cargarTareas();
+  }, []);
+
+  // 2. Crear una nueva tarea enviando datos al backend (POST)
+  const crearTarea = async () => {
+    if (!titulo.trim()) return alert('Escribe un título');
+
+    try {
+      // Agregamos la URL completa del backend de FastAPI
+      await axios.post('http://127.0.0.1:8000/tareas', {
+        titulo: titulo,
+        descripcion: descripcion
+      });
+      
+      // Limpiar los campos del formulario
+      setTitulo('');
+      setDescripcion('');
+      
+      // Volver a consultar las tareas actualizadas
+      cargarTareas();
+    } catch (err) {
+      console.error("Error al guardar la tarea:", err);
+      alert("No se pudo guardar la tarea");
+    }
+  };
+
+
+
+
+
+  useEffect(() => {
+    axios.get('http://127.0.0.1:8000/tareas')
+      .then((response) => {
+        setData(response.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error al conectar con el backend:", err);
+        setError("No se pudo conectar con el backend");
+        setLoading(false);
+      });
+  }, []);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  return (
+    <>
+      <section id="center">
+        <div className="hero">
+          <img src={heroImg} className="base" width="170" height="179" alt="" />
+          <img src={reactLogo} className="framework" alt="React logo" />
+          <img src={viteLogo} className="vite" alt="Vite logo" />
+        </div>
+        <div>
+          <h1>Get started</h1>
+          <p>
+            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
+          </p>
+        </div>
+        <button
+          type="button"
+          className="counter"
+          onClick={() => setCount((count) => count + 1)}
+        >
+          Count is {count}
+        </button>
+
+
+
+    <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
+      <h1>Conexión React a Backend</h1>
+      
+      {loading && <p>Cargando datos...</p>}
+      
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      
+      {data && (
+        <div style={{ background: '#f0f0f0', padding: '15px', borderRadius: '5px' }}>
+          <h3>Respuesta del servidor:</h3>
+          <pre>{JSON.stringify(data, null, 2)}</pre>
+        </div>
+      )}
+    </div>
+
+
+
+    <div className="container">
+        <h2>Gestor de Tareas </h2>
+        <input type="text"  
+               placeholder="Título de la tarea"  
+               value={titulo}
+               onChange={(e) => setTitulo(e.target.value)}/>
+        <input type="text" 
+               placeholder="Descripción"
+               value={descripcion}
+               onChange={(e) => setDescripcion(e.target.value)}/>
+        <button onClick={crearTarea}>Guardar Tarea</button>
+        <h3>Lista de Tareas</h3>
+        <ul id="lista"></ul>
+    </div>
+
+
+
+
+
+      </section>
+
+      <div className="ticks"></div>
+
+      <section id="next-steps">
+        <div id="docs">
+          <svg className="icon" role="presentation" aria-hidden="true">
+            <use href="/icons.svg#documentation-icon"></use>
+          </svg>
+          <h2>Documentation</h2>
+          <p>Your questions, answered</p>
+          <ul>
+            <li>
+              <a href="https://vite.dev/" target="_blank">
+                <img className="logo" src={viteLogo} alt="" />
+                Explore Vite
+              </a>
+            </li>
+            <li>
+              <a href="https://react.dev/" target="_blank">
+                <img className="button-icon" src={reactLogo} alt="" />
+                Learn more
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div id="social">
+          <svg className="icon" role="presentation" aria-hidden="true">
+            <use href="/icons.svg#social-icon"></use>
+          </svg>
+          <h2>Connect with us</h2>
+          <p>Join the Vite community</p>
+          <ul>
+            <li>
+              <a href="https://github.com/vitejs/vite" target="_blank">
+                <svg
+                  className="button-icon"
+                  role="presentation"
+                  aria-hidden="true"
+                >
+                  <use href="/icons.svg#github-icon"></use>
+                </svg>
+                GitHub
+              </a>
+            </li>
+            <li>
+              <a href="https://chat.vite.dev/" target="_blank">
+                <svg
+                  className="button-icon"
+                  role="presentation"
+                  aria-hidden="true"
+                >
+                  <use href="/icons.svg#discord-icon"></use>
+                </svg>
+                Discord
+              </a>
+            </li>
+            <li>
+              <a href="https://x.com/vite_js" target="_blank">
+                <svg
+                  className="button-icon"
+                  role="presentation"
+                  aria-hidden="true"
+                >
+                  <use href="/icons.svg#x-icon"></use>
+                </svg>
+                X.com
+              </a>
+            </li>
+            <li>
+              <a href="https://bsky.app/profile/vite.dev" target="_blank">
+                <svg
+                  className="button-icon"
+                  role="presentation"
+                  aria-hidden="true"
+                >
+                  <use href="/icons.svg#bluesky-icon"></use>
+                </svg>
+                Bluesky
+              </a>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <div className="ticks"></div>
+      <section id="spacer"></section>
+    </>
+  )
+}
+
+export default App
